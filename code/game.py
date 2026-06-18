@@ -1,12 +1,16 @@
 import pygame
 from code.menu import Menu
+from code.const import WINDOW_HEIGHT
+from code.const import WINDOW_WIDTH
+
 
 class Game:
     def __init__(self):
         pygame.init()
-        self.window = pygame.display.set_mode(size=(600, 480))
+        self.window = pygame.display.set_mode(size=(WINDOW_WIDTH, WINDOW_HEIGHT))
 
     def run(self):
+
         while True:
             menu = Menu(self.window)
             menu.run()
