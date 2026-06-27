@@ -10,7 +10,7 @@ from code.entity import Entity
 class Enemy(Entity):
     def __init__(self, name: str, position: tuple):
         super().__init__(name, position)
-        self.shot_delay= ENTITY_SHOT_DELAY[self.name]
+        self.shot_delay = ENTITY_SHOT_DELAY[self.name]
         self.surf = pygame.image.load(f'asset/{name}.png')
         self.surf = pygame.transform.scale(self.surf, (88, 48))
         self.rect = self.surf.get_rect(midleft=position)
@@ -24,5 +24,3 @@ class Enemy(Entity):
             self.shot_delay = ENTITY_SHOT_DELAY[self.name]
             return EnemyShot(name=f'{self.name}Shot', position=(self.rect.centerx, self.rect.centery))
         return None
-
-
