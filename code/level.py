@@ -7,9 +7,12 @@ import pygame.display
 from pygame import Surface, Rect
 from pygame.font import Font
 
-from code.const import COLOR_WHITE, WINDOW_HEIGHT, WINDOW_WIDTH, MENU_OPTION, EVENT_ENEMY, SPAWN_TIME
+from code.EntityMediator import EntityMediator
+from code.const import COLOR_WHITE, WINDOW_HEIGHT, MENU_OPTION, EVENT_ENEMY, SPAWN_TIME
+from code.enemy import Enemy
 from code.entity import Entity
 from code.entityFactory import EntityFactory
+from code.player import Player
 
 
 class Level:
@@ -32,6 +35,13 @@ class Level:
         clock = pygame.time.Clock()
         while True:
             clock.tick(60)
+            for ent in self.entity_list:
+                self.window.blit(source=ent.surf, dest=ent.rect)
+                ent.move()
+                if isinstance(ent, (Player, Enemy)):
+                    shoot = ent.shoot()
+                    if shoot is not None:
+                        self.entity_list.append(shoot)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -41,14 +51,17 @@ class Level:
                     self.entity_list.append(EntityFactory.get_entity(choice
                                                                      ))
 
-            for ent in self.entity_list:
-                self.window.blit(source=ent.surf, dest=ent.rect)
-                ent.move()
 
+            # Printed Text
             self.level_text(f'{self.name} - Timeout: {self.timeout / 1000 :.1f}s', COLOR_WHITE, (10, 5))
             self.level_text(f'fps: {clock.get_fps():.1f}', COLOR_WHITE, (10, WINDOW_HEIGHT - 35))
             self.level_text(f'entidades: {len(self.entity_list)}', COLOR_WHITE, (10, WINDOW_HEIGHT - 20))
             pygame.display.flip()
+            # Collisions
+
+            EntityMediator.verify_collision(entity_list=self.entity_list)
+            EntityMediator.verify_health(entity_list=self.entity_list)
+            pass
 
     def level_text(self, text: str, text_color: tuple, text_pos: tuple):
         text_surf: Surface = self.text_font.render(text, True, text_color).convert_alpha()
