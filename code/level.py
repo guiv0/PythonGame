@@ -34,13 +34,21 @@ class Level:
         self.entity_list.append(player)
         self.text_font: Font = pygame.font.SysFont(name="Lucida Sans Typewriter", size=14)
 
-        if game_mode in [MENU_OPTION[1], MENU_OPTION[2]]:
+        if game_mode in [MENU_OPTION[1]]:
             player2 = EntityFactory.get_entity('Player2')
             player2.score = player_score[1]
             self.entity_list.append(player2)
 
         pygame.time.set_timer(EVENT_ENEMY, SPAWN_TIME)
         pygame.time.set_timer(EVENT_TIMEOUT, TIMEOUT_STEP)
+
+    def _save_scores(self):
+        for ent in self.entity_list:
+            if isinstance(ent, Player):
+                if ent.name == 'Player1':
+                    self.player_score_ref[0] = ent.score
+                elif ent.name == 'Player2':
+                    self.player_score_ref[1] = ent.score
 
     def run(self):
         pygame.mixer_music.load(f'./asset/{self.name}.mp3')
@@ -81,12 +89,9 @@ class Level:
                 if event.type == EVENT_TIMEOUT:
                     self.timeout -= TIMEOUT_STEP
                     if self.timeout <= 0:
-                        for ent in self.entity_list:
-                            if isinstance(ent, Player):
-                                if ent.name == 'Player1':
-                                    self.player_score_ref[0] = ent.score
-                                elif ent.name == 'Player2':
-                                    self.player_score_ref[1] = ent.score
+                        self._save_scores()  # Salva pontos obtidos ao vencer
+                        pygame.time.set_timer(EVENT_ENEMY, 0)  # Limpa o timer ao sair
+                        pygame.time.set_timer(EVENT_TIMEOUT, 0)  # Limpa o timer ao sair
                         return True
 
             found_player = False
@@ -96,6 +101,9 @@ class Level:
                     break
 
             if not found_player:
+                self._save_scores()  # Salva pontos acumulados mesmo se morrer
+                pygame.time.set_timer(EVENT_ENEMY, 0)  # Limpa o timer ao sair
+                pygame.time.set_timer(EVENT_TIMEOUT, 0)  # Limpa o timer ao sair
                 return False
 
             self.level_text(f'{self.name} - Timeout: {self.timeout / 1000 :.1f}s', C_L_CREAM, (10, 5))

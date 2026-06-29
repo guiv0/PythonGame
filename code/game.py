@@ -1,3 +1,5 @@
+import sys
+
 import pygame
 
 from code.const import MENU_OPTION
@@ -29,13 +31,11 @@ class Game:
                     if level_return:
                         score.save(menu_return, player_score)
 
-
-
             elif menu_return == MENU_OPTION[2]:
                 score.show()
-
             elif menu_return == MENU_OPTION[3]:
-                pygame.quit()
-                quit()
+                pygame.quit()  # Close Window
+                quit()  # end pygame
             else:
-                pass
+                pygame.quit()
+                sys.exit()
